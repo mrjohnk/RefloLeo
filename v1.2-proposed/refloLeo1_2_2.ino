@@ -56,16 +56,6 @@ void setup() {
 
   lcd.begin(16, 2);
 
-  
-  updateLCD(" RefloLeo 1.2! ", "Now has 16x2 LCD");
-  analogWrite(relayPin,10);
-  while(1){
-    digitalWrite(relayAux, HIGH);
-    delayMicroseconds(100); // Approximately 10% duty cycle @ 1KHz
-    digitalWrite(relayAux, LOW);
-    delayMicroseconds(1000 - 100);
-    }
-  
   if(!sdcard.begin(SS, SPI_HALF_SPEED)){
     Serial.println("SD initialization failed!");
     updateLCD("No SD Memory","Card Detected ");
@@ -435,6 +425,14 @@ void updateDisplay(void){
   char disp[17] = "Temp:";
   strcat(disp,c_str);
   updateLCD(dispInstruction, disp);
+
+  //Safety to prevent out-of-range temperature readings
+  if( (int) c < 10 || (int) c > 275){
+    updateLCD(" Error: Invalid ", "  Temperature   ");
+    digitalWrite(relayPin,LOW);
+    digitalWrite(relayAux,LOW);
+    while(1);
+    }
   }
 
 ///////////////////////////////////////////////
@@ -505,7 +503,6 @@ void loop() {
 
   currTime = millis();
   
-  //if there is no active command, read another from SD card
   if(instructionStatus == 0 && currInstruction != 'X')
     getInstruction();
   
