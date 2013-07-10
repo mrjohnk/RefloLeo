@@ -3623,10 +3623,9 @@ by exp-project-lbr.ulp</description>
 <label x="53.34" y="20.32" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP3" gate="G$1" pin="4"/>
-<wire x1="99.06" y1="-40.64" x2="96.52" y2="-40.64" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="-40.64" x2="109.22" y2="-40.64" width="0.1524" layer="91"/>
-<label x="104.14" y="-40.64" size="1.778" layer="95"/>
+<pinref part="U$16" gate="G$1" pin="GATE"/>
+<wire x1="-109.22" y1="-30.48" x2="-93.98" y2="-30.48" width="0.1524" layer="91"/>
+<label x="-96.52" y="-30.48" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="B4" class="0">
@@ -3818,9 +3817,9 @@ by exp-project-lbr.ulp</description>
 <label x="53.34" y="2.54" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$16" gate="G$1" pin="GATE"/>
-<wire x1="-109.22" y1="-30.48" x2="-93.98" y2="-30.48" width="0.1524" layer="91"/>
-<label x="-96.52" y="-30.48" size="1.778" layer="95"/>
+<pinref part="JP3" gate="G$1" pin="4"/>
+<wire x1="96.52" y1="-40.64" x2="109.22" y2="-40.64" width="0.1524" layer="91"/>
+<label x="104.14" y="-40.64" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$15" class="0">
