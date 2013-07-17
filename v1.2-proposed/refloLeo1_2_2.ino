@@ -9,7 +9,7 @@ int thermoDO = A5;  //F0
 
 #define relayPin 11
 #define relayAux A11
-#define thresh 2000 //capacitive touch detect threshold
+#define thresh 2200 //capacitive touch detect threshold
 
 CapacitiveSensor cs_up = CapacitiveSensor(13,A9);  // C7,B5 (32,29)
 CapacitiveSensor cs_dn = CapacitiveSensor(A2,7);   // F5,E6 (38,1)
@@ -36,9 +36,10 @@ SdFile SDfileLog;
 
 char currInstruction = 'O';
 unsigned long currTime;
-unsigned long timers[3] = {0,0,0};
+unsigned long timers[4] = {0,0,0};
 byte instructionStatus = 0;
 unsigned long instructionExpire;
+double currTemp = 0;
 char parameter = ' ';
 char v1_str[4];
 char v2_str[4];
@@ -46,7 +47,7 @@ long v1_int;
 long v2_int;
 int selectedprofile = -1;
 byte tempindex=0; //stores incremental time iterations for recording temperatures in output file
-byte logFileStat=0;
+byte logFileStat=0; //
 
 void setup() {
   pinMode(relayPin, OUTPUT);
@@ -92,11 +93,12 @@ void setup() {
 void selfTest(void){
   if(SDfile.open("selftest", O_WRITE)){
     updateLCD("Open selftest","SUCCESS");
-    delay(3000);
     }
   else{
     updateLCD("Open selftest","FAILED");
     }
+
+  delay(3000);
 
   byte fets[2]={0,1};
   
@@ -122,7 +124,7 @@ void selfTest(void){
     digitalWrite(relayPin,fets[0]);
     digitalWrite(relayAux,fets[1]);    
 
-    delay(500);
+    delay(800);
     }
 
   if(SDfile.remove())
@@ -309,9 +311,8 @@ byte checkHold(void){
   if(currTime > instructionExpire){
     instructionStatus = 0;
     }
-  else{
-    int c = thermocouple.readCelsius();
-    int delta = v1_int - c;
+  else {
+    int delta = v1_int - currTemp;
     if(delta > 0)
       digitalWrite(relayPin,HIGH);
     else
@@ -321,8 +322,8 @@ byte checkHold(void){
 
 //////////////////////////////////////////////
 byte checkTemp(void){
-  int c = thermocouple.readCelsius();
-  int delta = c - v1_int;
+  int delta = currTemp - v1_int;
+
   if(delta >= 0){
     instructionStatus = 0;
     }
@@ -392,6 +393,7 @@ void calcTimeLeft(char *timeLeft){
 
 ///////////////////////////////////////////////
 void updateDisplay(void){
+    
   char dispInstruction[17];
   char timeleft[4]="";
 
@@ -415,25 +417,20 @@ void updateDisplay(void){
   else if(currInstruction == 'X')
     strcpy(dispInstruction,"EXIT");
     
-  double c = thermocouple.readCelsius();
   char c_str[7];
-  dtostrf(c,5,1,&c_str[0]);
+  dtostrf(currTemp,5,1,&c_str[0]);
 
   Serial.print("Temp=");
-  Serial.println(c);
+  Serial.print(currTemp);
+  Serial.print(" | ");
+  Serial.println(currInstruction);
 
   char disp[17] = "Temp:";
   strcat(disp,c_str);
   updateLCD(dispInstruction, disp);
 
-  //Safety to prevent out-of-range temperature readings
-  if( (int) c < 10 || (int) c > 275){
-    updateLCD(" Error: Invalid ", "  Temperature   ");
-    digitalWrite(relayPin,LOW);
-    digitalWrite(relayAux,LOW);
-    while(1);
-    }
   }
+
 
 ///////////////////////////////////////////////
 void checkExit(void){
@@ -445,16 +442,14 @@ void checkExit(void){
 ///////////////////////////////////////////////
 void logTemp(void){
 
-  double c = thermocouple.readCelsius();    
-  
-  if(c < 125 && logFileStat == 2){
+  if(currTemp < 125 && logFileStat == 2){
     sdRWfile('c',selectedprofile,'o');        
     logFileStat=0;
     updateLCD("   Log Closed   ","");  
     delay(2000);
     }
 
-  if(logFileStat == 1 && c > 125)
+  if(logFileStat == 1 && currTemp > 125)
     logFileStat=2;
 
   if(logFileStat > 0){  
@@ -462,8 +457,8 @@ void logTemp(void){
     char tempIndexStr[4];
 
     char c_str[7];
-    if(c >= 100) dtostrf(c,5,1,&c_str[0]);
-    else dtostrf(c,4,1,&c_str[0]);
+    if(currTemp >= 100) dtostrf(currTemp,5,1,&c_str[0]);
+    else dtostrf(currTemp,4,1,&c_str[0]);
 
     itoa(tempindex,&tempIndexStr[0],10);
 
@@ -474,6 +469,12 @@ void logTemp(void){
     sdRW(tbuff,'o',strlen(tbuff));
     tempindex++;
     }
+  }
+
+void updateTemp(){
+  double c = thermocouple.readCelsius();
+  if(c > 10 && c < 285) //filters out erroneous thermocouple readings
+    currTemp = c;
   }
 
 ///////////////// Main Instruction Set ////////////////////////////// 
@@ -502,22 +503,25 @@ Timers:
 void loop() {
 
   currTime = millis();
+
+  if(currTime > timers[3]){
+    timers[3] = currTime + 1000;
+    updateTemp();
+    }
   
   if(instructionStatus == 0 && currInstruction != 'X')
     getInstruction();
   
   if(currTime > timers[1] && instructionStatus == 1){
+    timers[1] = currTime + 1000;
     if(currInstruction=='T') {
       checkTemp();
-      timers[1] = currTime + 1000;
       }
     else if(currInstruction=='H'){
       checkHold();
-      timers[1] = currTime + 1000;
       }
     else if(currInstruction=='W'){
       checkWait();
-      timers[1] = currTime + 1000;
       }
     else if(currInstruction=='X'){
       checkExit();
@@ -537,8 +541,17 @@ void loop() {
   if(checkcapbutton(2) && logFileStat > 0){
     sdRWfile('c',selectedprofile,'o');
     updateLCD("   Log Closed   ","");  
-    delay(2000);
+    delay(1000);
     }
+
+  //Safety
+  if( (int) currTemp > 275){
+    updateLCD(" Error: Invalid ", "  Temperature   ");
+    digitalWrite(relayPin,LOW);
+    digitalWrite(relayAux,LOW);
+    while(1);
+    }
+
 
   }
   
