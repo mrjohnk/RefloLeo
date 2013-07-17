@@ -2921,8 +2921,8 @@ by exp-project-lbr.ulp</description>
 <part name="U$12" library="JKCustom" deviceset="MOM-SWITCH-EG4620CT-ND" device=""/>
 <part name="LED1" library="SparkFun-LED" deviceset="LED" device="0603"/>
 <part name="LED2" library="SparkFun-LED" deviceset="LED" device="0603"/>
-<part name="R4" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="150"/>
-<part name="R5" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="150"/>
+<part name="R4" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="680"/>
+<part name="R5" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="510"/>
 <part name="U$13" library="JKCustom" deviceset="CAPTOUCH_ARROW" device=""/>
 <part name="U$14" library="JKCustom" deviceset="CAPTOUCH_ARROW" device=""/>
 <part name="U$15" library="JKCustom" deviceset="CAPTOUCH_SQUARE" device=""/>
@@ -2946,6 +2946,7 @@ by exp-project-lbr.ulp</description>
 <part name="U$7" library="JKCustom" deviceset="2POS_TERM_ED2748-ND" device=""/>
 <part name="JP3" library="SparkFun-Connectors" deviceset="M10" device="LOCK"/>
 <part name="R9" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="10K"/>
+<part name="R3" library="SparkFun-Passives" deviceset="RESISTOR" device="0603-RES" value="390"/>
 </parts>
 <sheets>
 <sheet>
@@ -3007,6 +3008,7 @@ by exp-project-lbr.ulp</description>
 <instance part="U$7" gate="G$1" x="-88.9" y="-10.16"/>
 <instance part="JP3" gate="G$1" x="86.36" y="-30.48"/>
 <instance part="R9" gate="G$1" x="106.68" y="-12.7"/>
+<instance part="R3" gate="G$1" x="-109.22" y="109.22"/>
 </instances>
 <busses>
 </busses>
@@ -3307,6 +3309,7 @@ by exp-project-lbr.ulp</description>
 <segment>
 <pinref part="FUSE1" gate="G$1" pin="2"/>
 <wire x1="-88.9" y1="58.42" x2="-81.28" y2="58.42" width="0.1524" layer="91"/>
+<label x="-83.82" y="58.42" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="U$17" gate="G$1" pin="P$2"/>
@@ -3332,6 +3335,11 @@ by exp-project-lbr.ulp</description>
 <pinref part="R9" gate="G$1" pin="2"/>
 <wire x1="111.76" y1="-12.7" x2="121.92" y2="-12.7" width="0.1524" layer="91"/>
 <label x="119.38" y="-12.7" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R3" gate="G$1" pin="1"/>
+<wire x1="-114.3" y1="109.22" x2="-119.38" y2="109.22" width="0.1524" layer="91"/>
+<label x="-119.38" y="109.22" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$8" class="0">
@@ -3524,11 +3532,6 @@ by exp-project-lbr.ulp</description>
 <pinref part="R10" gate="G$1" pin="1"/>
 <junction x="-99.06" y="10.16"/>
 <wire x1="-99.06" y1="10.16" x2="-111.76" y2="10.16" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="LED3" gate="G$1" pin="A"/>
-<wire x1="-96.52" y1="109.22" x2="-119.38" y2="109.22" width="0.1524" layer="91"/>
-<label x="-119.38" y="109.22" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="JP3" gate="G$1" pin="8"/>
@@ -4027,6 +4030,13 @@ by exp-project-lbr.ulp</description>
 <pinref part="JP3" gate="G$1" pin="1"/>
 <wire x1="96.52" y1="-48.26" x2="109.22" y2="-48.26" width="0.1524" layer="91"/>
 <label x="104.14" y="-48.26" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$6" class="0">
+<segment>
+<pinref part="LED3" gate="G$1" pin="A"/>
+<pinref part="R3" gate="G$1" pin="2"/>
+<wire x1="-96.52" y1="109.22" x2="-104.14" y2="109.22" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
