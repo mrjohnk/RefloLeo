@@ -85,6 +85,8 @@ void setup() {
   sdRWfile('o',selectedprofile,'o');  // Open profile output file
   logFileStat=1;
 
+  while(checkcapbutton(2));  //wait until select button is released
+
   Serial.println("going to main loop");
 
 } 
@@ -118,12 +120,8 @@ void selfTest(void){
 
     updateLCD("Running-SelfTest", disp);
 
-    byte x=0;
-    for(x=0;x<255;x++){
-      analogWrite(relayPin,fets[0]++);
-      analogWrite(relayAux,fets[1]++);    
-      delay(15);
-      }
+    analogWrite(relayPin,fets[0]+=6);
+    analogWrite(relayAux,fets[1]+=6);    
     }
 
   if(SDfile.remove())
@@ -441,7 +439,7 @@ void checkExit(void){
 ///////////////////////////////////////////////
 void logTemp(void){
 
-  if(currTemp < 125 && currTemp > 100 && logFileStat == 2){
+  if(currTemp < 125 && logFileStat == 2){
     sdRWfile('c',selectedprofile,'o');        
     logFileStat=0;
     updateLCD("   Log Closed   ","");  
